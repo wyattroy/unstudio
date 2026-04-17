@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function updateCountdown() {
   const end = typeof UNSTUDIO_END_DATE !== 'undefined'
     ? UNSTUDIO_END_DATE
-    : new Date('2026-04-21T23:59:59');
+    : new Date('2026-04-20T23:59:59');
 
   const now  = new Date();
   const diff = end - now;

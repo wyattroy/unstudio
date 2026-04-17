@@ -12,7 +12,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 // ============================================================
 
 // The date the unstudio closes (used for the countdown timer)
-const UNSTUDIO_END_DATE = new Date('2026-04-21T23:59:59');
+const UNSTUDIO_END_DATE = new Date('2026-04-20T23:59:59');
 
 // Admin email for Supabase Auth login
 const ADMIN_EMAIL = 'wyatty@gmail.com';
