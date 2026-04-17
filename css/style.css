@@ -123,9 +123,9 @@ a { color: inherit; }
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(10,10,10,0.92) 0%,
-    rgba(10,10,10,0.55) 45%,
-    rgba(10,10,10,0.25) 100%
+    rgba(10,10,10,0.45) 0%,
+    rgba(10,10,10,0.15) 45%,
+    rgba(10,10,10,0.00) 100%
   );
 }
 
@@ -343,6 +343,27 @@ a { color: inherit; }
   color: rgba(255,255,255,0.8);
   line-height: 1.5;
   font-weight: 500;
+}
+
+/* ===== VIDEO ===== */
+.video-section {
+  width: 100%;
+  background: var(--black);
+}
+
+.video-embed {
+  position: relative;
+  padding-top: 56.25%; /* 16:9 */
+  background: url('../images/snapshot.jpg') center/cover no-repeat;
+}
+
+.video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
 }
 
 /* ===== USAGE DATA ===== */
