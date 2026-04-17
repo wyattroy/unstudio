@@ -108,7 +108,7 @@ a { color: inherit; }
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url('../images/Unstudio Poster v3.jpg');
+  background-image: url('../images/hero-bg.jpg');
   background-size: cover;
   background-position: center top;
   z-index: 0;
@@ -546,7 +546,6 @@ a { color: inherit; }
   font-size: 0.875rem;
   color: #555;
   line-height: 1.6;
-  font-style: italic;
 }
 
 .supporter-date {
@@ -746,7 +745,6 @@ a { color: inherit; }
   line-height: 1.65;
   border-radius: 0 2px 2px 0;
   margin-bottom: 1rem;
-  font-style: italic;
 }
 
 /* ===== TIMELINE (archive) ===== */
@@ -1149,7 +1147,7 @@ a { color: inherit; }
 .admin-table tr:hover td { background: var(--off-white); }
 
 .admin-email-cell { font-size: 0.8rem; color: var(--gray); }
-.admin-comment-cell { font-style: italic; color: #555; line-height: 1.5; }
+.admin-comment-cell { color: #555; line-height: 1.5; }
 
 .badge {
   display: inline-block;
@@ -1251,6 +1249,17 @@ a { color: inherit; }
   color: rgba(255,255,255,0.25);
   width: 100%;
   margin-top: 1rem;
+}
+
+/* ===== UNSTUDIO WORDMARK — always GSD Gothic Bold, never italic ===== */
+.hero-wordmark,
+.nav-logo,
+.footer-logo,
+.unstudio-word {
+  font-family: var(--font);
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: -0.04em;
 }
 
 /* ===== UTILITY ===== */
