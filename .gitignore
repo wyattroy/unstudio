@@ -1,0 +1,8 @@
+# Source files not needed for deployment
+*.zip
+*.rtf
+*.xlsx
+*.DS_Store
+fonts/__MACOSX/
+images/__MACOSX/
+.claude/

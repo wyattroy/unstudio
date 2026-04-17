@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — unstudio</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Prevent search indexing of admin page -->
+  <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+
+<!-- Nav (shown when logged in) -->
+<nav class="nav" id="admin-nav" style="display:none">
+  <a class="nav-logo" href="index.html">unstudio</a>
+  <ul class="nav-links">
+    <li><a href="index.html">← Back to site</a></li>
+  </ul>
+  <button class="btn btn-outline-white btn-sm" id="logout-btn" style="font-size:0.75rem">Sign out</button>
+</nav>
+
+<!-- ===== NOT CONFIGURED ===== -->
+<div id="not-configured" style="display:none;min-height:100vh;background:var(--black);display:flex;align-items:center;justify-content:center;padding:2rem">
+  <div style="max-width:420px;color:var(--white);text-align:center">
+    <div style="font-size:2rem;font-weight:800;margin-bottom:1rem">unstudio admin</div>
+    <p style="color:rgba(255,255,255,0.5);line-height:1.6;font-size:0.9rem">
+      Supabase is not yet configured. Follow the instructions in
+      <code style="color:var(--pink)">SUPABASE_SETUP.md</code>
+      to connect the database, then reload this page.
+    </p>
+    <div style="margin-top:2rem">
+      <a href="index.html" class="btn btn-outline-white btn-sm">← Back to site</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOGIN VIEW ===== -->
+<div class="admin-wrap" id="admin-login">
+  <div class="admin-login-card">
+    <div class="admin-login-logo">unstudio</div>
+    <div class="admin-login-subtitle">Admin panel</div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label" for="login-email">Email</label>
+        <input class="form-input" type="email" id="login-email" name="email"
+               value="wyatt_roy@gsd.harvard.edu" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="login-password">Password</label>
+        <input class="form-input" type="password" id="login-password" name="password"
+               required autocomplete="current-password" placeholder="••••••••••••">
+      </div>
+      <button type="submit" class="btn btn-pink" style="width:100%">Sign in</button>
+    </form>
+
+    <div id="login-error" style="display:none;margin-top:1rem;padding:0.875rem 1rem;
+         background:rgba(220,53,69,0.15);border:1px solid #dc3545;border-radius:2px;
+         color:#ff7c8a;font-size:0.875rem">
+    </div>
+
+    <div style="margin-top:2rem;text-align:center">
+      <a href="index.html" style="font-size:0.75rem;color:rgba(255,255,255,0.3);text-decoration:none">
+        ← Back to site
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div class="admin-panel" id="admin-panel" style="display:none">
+  <div class="admin-panel-header">
+    <div>
+      <h1 class="admin-panel-title">Petition Moderation</h1>
+      <p style="font-size:0.85rem;color:var(--gray);margin-top:0.25rem">
+        Approve or delete entries from the wall of support.
+      </p>
+    </div>
+    <button class="btn btn-outline-pink btn-sm" onclick="fetchSupporters()">↻ Refresh</button>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="admin-stats-bar">
+    <div class="admin-stat">
+      <span class="admin-stat-num" id="admin-total">—</span>
+      <span class="admin-stat-label">Total submissions</span>
+    </div>
+    <div class="admin-stat">
+      <span class="admin-stat-num" id="admin-approved">—</span>
+      <span class="admin-stat-label">Approved (public)</span>
+    </div>
+    <div class="admin-stat">
+      <span class="admin-stat-num" id="admin-pending">—</span>
+      <span class="admin-stat-label">Pending review</span>
+    </div>
+  </div>
+
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>GSD Email</th>
+          <th>Comment</th>
+          <th>Status</th>
+          <th>Submitted</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="supporters-tbody">
+        <tr><td colspan="6" class="admin-empty">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:2rem;font-size:0.75rem;color:var(--gray);line-height:1.5">
+    <strong>Note:</strong> Seeded entries (from <code>data/supporters.json</code>) are
+    displayed on the public wall but are not stored in Supabase and won't appear here.
+    This table shows only live submissions.
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/admin.js"></script>
+
+<script>
+  // Show nav when panel is visible
+  const observer = new MutationObserver(() => {
+    const panel = document.getElementById('admin-panel');
+    const nav   = document.getElementById('admin-nav');
+    if (panel && nav) {
+      nav.style.display = panel.style.display === 'none' ? 'none' : 'flex';
+    }
+  });
+  const panel = document.getElementById('admin-panel');
+  if (panel) observer.observe(panel, { attributes: true, attributeFilter: ['style'] });
+</script>
+
+</body>
+</html>
