@@ -19,4 +19,4 @@ const ADMIN_EMAIL = 'wyatty@gmail.com';
 
 // Seeded supporter count offset (number of entries in supporters.json)
 // Update this if you add/remove entries from data/supporters.json
-const SEEDED_COUNT = 10;
+const SEEDED_COUNT = 0;

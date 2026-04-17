@@ -33,7 +33,7 @@ async function loadSupporters() {
   if (supabaseClient) {
     const { data, error } = await supabaseClient
       .from('supporters')
-      .select('name, comment, created_at')
+      .select('name, program, comment, created_at')
       .eq('approved', true)
       .order('created_at', { ascending: false });
 
@@ -41,6 +41,7 @@ async function loadSupporters() {
       live = data.map(d => ({
         id:      d.id,
         name:    d.name,
+        program: d.program,
         comment: d.comment,
         date:    formatDate(d.created_at),
       }));
@@ -71,6 +72,7 @@ async function loadSupporters() {
     card.className = 'supporter-card';
     card.innerHTML = `
       <div class="supporter-name">${escapeHtml(s.name)}</div>
+      ${s.program ? `<div class="supporter-program">${escapeHtml(s.program)}</div>` : ''}
       ${s.comment ? `<div class="supporter-comment">"${escapeHtml(s.comment)}"</div>` : ''}
       <div class="supporter-date">${s.date || ''}</div>
     `;
@@ -101,6 +103,7 @@ async function initPetitionForm() {
     e.preventDefault();
     const submitBtn = form.querySelector('button[type="submit"]');
     const name      = form.name.value.trim();
+    const program   = form.program.value.trim();
     const email     = form.gsd_email.value.trim().toLowerCase();
     const comment   = form.comment.value.trim();
 
@@ -115,7 +118,7 @@ async function initPetitionForm() {
 
     const { error } = await supabaseClient
       .from('supporters')
-      .insert([{ name, gsd_email: email, comment: comment || null }]);
+      .insert([{ name, program: program || null, gsd_email: email, comment: comment || null }]);
 
     if (error) {
       showFeedback(feedback, 'error', 'Something went wrong. Please try again.');

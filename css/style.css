@@ -9,6 +9,7 @@
   src: url('../fonts/GSD Gothic Fonts/GSD Gothic Variable/Web/GSDGothicVariableVF.woff2') format('woff2'),
        url('../fonts/GSD Gothic Fonts/GSD Gothic Variable/Web/GSDGothicVariableVF.woff') format('woff');
   font-weight: 100 900;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -31,6 +32,8 @@
 html { scroll-behavior: smooth; }
 body {
   font-family: var(--font);
+  font-style: normal;
+  font-variation-settings: 'ital' 0;
   color: var(--black);
   background: var(--white);
   line-height: 1.5;
@@ -540,6 +543,15 @@ a { color: inherit; }
   font-weight: 700;
   color: var(--black);
   margin-bottom: 0.4rem;
+}
+
+.supporter-program {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--pink);
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .supporter-comment {
