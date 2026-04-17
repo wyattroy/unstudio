@@ -26,7 +26,7 @@ const notConfigEl = document.getElementById('not-configured');
 // ---- Bootstrap ----
 document.addEventListener('DOMContentLoaded', async () => {
   if (!CONFIGURED) {
-    if (notConfigEl) notConfigEl.style.display = 'block';
+    if (notConfigEl) notConfigEl.style.display = 'flex';
     return;
   }
 
