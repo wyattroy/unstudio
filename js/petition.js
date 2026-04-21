@@ -1,5 +1,5 @@
 // ===================================================
-// petition.js — wall of support + petition form
+// petition.js — quote wall + reaction form
 // ===================================================
 
 const SUPABASE_CONFIGURED =
@@ -63,7 +63,7 @@ async function loadSupporters() {
   // 5. Render wall
   wall.innerHTML = '';
   if (all.length === 0) {
-    wall.innerHTML = '<div class="wall-loading">No supporters yet. Be the first!</div>';
+    wall.innerHTML = '<div class="wall-loading">No reactions yet. Be the first!</div>';
     return;
   }
 
@@ -123,14 +123,14 @@ async function initPetitionForm() {
     if (error) {
       showFeedback(feedback, 'error', 'Something went wrong. Please try again.');
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Sign the petition';
+      submitBtn.textContent = 'Add your voice';
       return;
     }
 
     form.reset();
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Sign the petition';
-    showFeedback(feedback, 'success', 'Thank you for signing! Your name will appear on the wall shortly.');
+    submitBtn.textContent = 'Add your voice';
+    showFeedback(feedback, 'success', 'Thank you — your reaction will appear on the wall shortly.');
 
     // Reload the wall to show the new entry
     setTimeout(loadSupporters, 1000);

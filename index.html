@@ -244,41 +244,48 @@
   <p class="quote-by">Wyatt Roy, MDes Candidate, Harvard GSD 2026</p>
 </section>
 
-<!-- ===== WALL OF SUPPORT ===== -->
+<!-- ===== QUOTE WALL ===== -->
 <section class="wall-section section">
   <div class="section-inner">
     <div class="wall-header">
       <div class="wall-count-block">
         <span class="wall-count" id="supporter-count" data-supporter-count>—</span>
-        <div class="wall-count-label">Signatories</div>
+        <div class="wall-count-label">Voices</div>
       </div>
       <div>
         <p class="section-body mb-0" style="max-width:36ch">
-          GSD students, faculty, and staff who believe the unstudio
-          should become a permanent feature of Gund Hall.
+          Reactions from the GSD community — what worked, what didn't,
+          and how the unstudio made you feel.
         </p>
-        <a href="#sign" class="btn btn-outline-pink mt-3" style="display:inline-block">Sign the petition ↓</a>
+        <a href="#sign" class="btn btn-outline-pink mt-3" style="display:inline-block">Add your voice ↓</a>
       </div>
     </div>
 
     <div class="wall-grid" id="supporters-wall">
-      <div class="wall-loading">Loading supporters…</div>
+      <div class="wall-loading">Loading voices…</div>
     </div>
   </div>
 </section>
 
-<!-- ===== PETITION FORM ===== -->
+<!-- ===== QUOTE WALL FORM ===== -->
 <section class="petition-section section" id="sign">
   <div class="petition-inner">
-    <p class="section-label">Add your name</p>
-    <h2 class="section-title">Sign the petition.</h2>
+    <p class="section-label">Add your voice</p>
+    <h2 class="section-title">How did it make you feel?</h2>
     <p class="section-body">
-      If you believe the unstudio should be made permanent, add your name.
-      Your GSD email verifies your affiliation and will never be displayed publicly.
+      For the unstudio to become permanent, it needs to work for <em>everyone</em> — not
+      just people who loved it. Was it too noisy for neighboring students? Did it feel
+      like a clique rather than a true drop-in? Did it take space away from teaching?
+      Does it need a longer test run before any decisions are made?
+    </p>
+    <p class="section-body">
+      Every honest reaction — enthusiastic, skeptical, or somewhere in between — makes
+      the case for getting this right. Your GSD email verifies your affiliation and will
+      never be displayed publicly.
     </p>
 
     <div id="supabase-missing" class="supabase-missing-note" style="display:none">
-      ⚠ The petition form requires Supabase to be configured. See <code>SUPABASE_SETUP.md</code> for setup instructions.
+      ⚠ The quote wall requires Supabase to be configured. See <code>SUPABASE_SETUP.md</code> for setup instructions.
     </div>
 
     <form id="petition-form">
@@ -299,11 +306,11 @@
         <p class="form-note">Used only to verify GSD affiliation. Never displayed publicly.</p>
       </div>
       <div class="form-group">
-        <label class="form-label" for="petition-comment">A comment (optional)</label>
+        <label class="form-label" for="petition-comment">Your reaction <span style="color:var(--pink)">*</span></label>
         <textarea class="form-textarea" id="petition-comment" name="comment"
-                  placeholder="What does the unstudio mean to you?" maxlength="500"></textarea>
+                  placeholder="How did the unstudio make you feel? What worked, what didn't, what would you change?" maxlength="500" required></textarea>
       </div>
-      <button type="submit" class="btn btn-pink">Sign the petition</button>
+      <button type="submit" class="btn btn-pink">Add your voice</button>
     </form>
     <div id="petition-feedback" class="form-feedback"></div>
   </div>
