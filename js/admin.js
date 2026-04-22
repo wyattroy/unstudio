@@ -12,16 +12,25 @@ if (CONFIGURED) {
 }
 
 // ---- DOM refs ----
-const loginView  = document.getElementById('admin-login');
-const panelView  = document.getElementById('admin-panel');
-const loginForm  = document.getElementById('login-form');
-const loginError = document.getElementById('login-error');
-const logoutBtn  = document.getElementById('logout-btn');
-const tableBody  = document.getElementById('supporters-tbody');
-const totalEl    = document.getElementById('admin-total');
-const pendingEl  = document.getElementById('admin-pending');
-const approvedEl = document.getElementById('admin-approved');
+const loginView   = document.getElementById('admin-login');
+const panelView   = document.getElementById('admin-panel');
+const loginForm   = document.getElementById('login-form');
+const loginError  = document.getElementById('login-error');
+const logoutBtn   = document.getElementById('logout-btn');
+const tableBody   = document.getElementById('supporters-tbody');
+const totalEl     = document.getElementById('admin-total');
+const pendingEl   = document.getElementById('admin-pending');
+const approvedEl  = document.getElementById('admin-approved');
 const notConfigEl = document.getElementById('not-configured');
+
+// Simple stats counter — kept in sync with DOM actions
+let stats = { total: 0, approved: 0 };
+
+function updateStatsDisplay() {
+  if (totalEl)    totalEl.textContent    = stats.total;
+  if (approvedEl) approvedEl.textContent = stats.approved;
+  if (pendingEl)  pendingEl.textContent  = stats.total - stats.approved;
+}
 
 // ---- Bootstrap ----
 document.addEventListener('DOMContentLoaded', async () => {
@@ -30,13 +39,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Check existing session
   const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    showPanel();
-  } else {
-    showLogin();
-  }
+  if (session) showPanel();
+  else showLogin();
 });
 
 // ---- Login ----
@@ -48,7 +53,7 @@ if (loginForm) {
     const btn      = loginForm.querySelector('button[type="submit"]');
 
     btn.disabled    = true;
-    btn.textContent = 'Signing in...';
+    btn.textContent = 'Signing in…';
     if (loginError) loginError.style.display = 'none';
 
     const { error } = await sb.auth.signInWithPassword({ email, password });
@@ -77,13 +82,13 @@ if (logoutBtn) {
 
 // ---- Views ----
 function showLogin() {
-  if (loginView)  loginView.style.display  = 'flex';
-  if (panelView)  panelView.style.display  = 'none';
+  if (loginView) loginView.style.display = 'flex';
+  if (panelView) panelView.style.display = 'none';
 }
 
 async function showPanel() {
-  if (loginView)  loginView.style.display  = 'none';
-  if (panelView)  panelView.style.display  = 'block';
+  if (loginView) loginView.style.display = 'none';
+  if (panelView) panelView.style.display = 'block';
   await fetchSupporters();
 }
 
@@ -105,21 +110,21 @@ async function fetchSupporters() {
 
   if (!data || data.length === 0) {
     tableBody.innerHTML = `<tr><td colspan="6" class="admin-empty">No submissions yet.</td></tr>`;
+    stats = { total: 0, approved: 0 };
+    updateStatsDisplay();
     return;
   }
 
-  // Stats
-  const total    = data.length;
-  const approved = data.filter(d => d.approved).length;
-  const pending  = total - approved;
-  if (totalEl)    totalEl.textContent    = total;
-  if (approvedEl) approvedEl.textContent = approved;
-  if (pendingEl)  pendingEl.textContent  = pending;
+  stats = {
+    total:    data.length,
+    approved: data.filter(d => d.approved).length,
+  };
+  updateStatsDisplay();
 
-  // Rows
   tableBody.innerHTML = '';
   data.forEach(row => {
     const tr = document.createElement('tr');
+    tr.dataset.id = row.id;
     tr.innerHTML = `
       <td>${escHtml(row.name)}</td>
       <td class="admin-email-cell">${escHtml(row.gsd_email)}</td>
@@ -147,26 +152,62 @@ async function fetchSupporters() {
   });
 }
 
-// ---- Actions ----
+// ---- Actions (in-place — no scroll reset) ----
+
 async function toggleApprove(id, current) {
+  const newApproved = !current;
+
   const { error } = await sb
     .from('supporters')
-    .update({ approved: !current })
+    .update({ approved: newApproved })
     .eq('id', id);
 
-  if (!error) fetchSupporters();
-  else alert('Error: ' + error.message);
+  if (error) { alert('Error: ' + error.message); return; }
+
+  // Update just this row
+  const tr = tableBody.querySelector(`tr[data-id="${id}"]`);
+  if (!tr) return;
+
+  const badge = tr.querySelector('.badge');
+  if (badge) {
+    badge.className   = `badge ${newApproved ? 'badge-approved' : 'badge-pending'}`;
+    badge.textContent = newApproved ? 'Approved' : 'Pending';
+  }
+
+  const btn = tr.querySelector('.btn-approve, .btn-unapprove');
+  if (btn) {
+    btn.className   = `btn btn-sm ${newApproved ? 'btn-unapprove' : 'btn-approve'}`;
+    btn.textContent = newApproved ? 'Hide' : 'Approve';
+    btn.setAttribute('onclick', `toggleApprove('${id}', ${newApproved})`);
+  }
+
+  // Update stats counter
+  stats.approved += newApproved ? 1 : -1;
+  updateStatsDisplay();
 }
 
 async function deleteRow(id) {
   if (!confirm('Delete this entry permanently?')) return;
+
   const { error } = await sb
     .from('supporters')
     .delete()
     .eq('id', id);
 
-  if (!error) fetchSupporters();
-  else alert('Error: ' + error.message);
+  if (error) { alert('Error: ' + error.message); return; }
+
+  const tr = tableBody.querySelector(`tr[data-id="${id}"]`);
+  if (tr) {
+    const wasApproved = tr.querySelector('.badge-approved') !== null;
+    tr.remove();
+    stats.total -= 1;
+    if (wasApproved) stats.approved -= 1;
+    updateStatsDisplay();
+  }
+
+  if (stats.total === 0) {
+    tableBody.innerHTML = `<tr><td colspan="6" class="admin-empty">No submissions yet.</td></tr>`;
+  }
 }
 
 // ---- Utils ----

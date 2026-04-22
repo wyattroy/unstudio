@@ -597,6 +597,47 @@ a { color: inherit; }
   font-size: 0.875rem;
 }
 
+.wall-disclaimer {
+  font-size: 0.8rem;
+  color: rgba(0,0,0,0.4);
+  line-height: 1.6;
+  max-width: 52ch;
+  margin-bottom: 2rem;
+}
+
+.supporters-name-list {
+  margin-top: 2rem;
+  columns: 2;
+  column-gap: 2rem;
+}
+
+@media (max-width: 600px) {
+  .supporters-name-list { columns: 1; }
+}
+
+.supporter-name-item {
+  font-size: 0.875rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  break-inside: avoid;
+}
+
+.supporter-name-item__name {
+  font-weight: 700;
+  color: var(--black);
+}
+
+.supporter-name-item__program {
+  color: var(--gray);
+}
+
+.paper-count-block {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
 /* ===== PETITION FORM ===== */
 .petition-section {
   background: var(--dark);
@@ -1065,6 +1106,14 @@ a { color: inherit; }
 .download-preview img {
   width: 100%; height: 100%;
   object-fit: cover;
+}
+.download-preview--fit {
+  aspect-ratio: auto;
+  height: auto;
+}
+.download-preview--fit img {
+  height: auto;
+  object-fit: contain;
 }
 .download-preview .svg-wrap {
   width: 100%; height: 100%;

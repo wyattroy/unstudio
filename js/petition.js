@@ -12,84 +12,107 @@ if (SUPABASE_CONFIGURED) {
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 }
 
+const PAPER_EMAIL = 'petition@gsd.harvard.edu';
+
 // ---- Load and render supporters ----
 
 async function loadSupporters() {
-  const wall       = document.getElementById('supporters-wall');
-  const countEl    = document.getElementById('supporter-count');
+  const wall         = document.getElementById('supporters-wall');
+  const nameList     = document.getElementById('supporters-name-list');
+  const paperCountEl = document.getElementById('paper-petition-count');
   if (!wall) return;
 
-  // 1. Load seeded supporters from JSON
+  // 1. Load seeded supporters from JSON (legacy; may be empty)
   let seeded = [];
   try {
     const res = await fetch('data/supporters.json');
     seeded = await res.json();
-  } catch (e) {
-    console.warn('Could not load seeded supporters:', e);
-  }
+  } catch (e) {}
 
-  // 2. Load live supporters from Supabase
+  // 2. Load all approved live entries from Supabase
   let live = [];
   if (supabaseClient) {
     const { data, error } = await supabaseClient
       .from('supporters')
-      .select('name, program, comment, created_at')
+      .select('name, program, comment, gsd_email, created_at')
       .eq('approved', true)
       .order('created_at', { ascending: false });
 
     if (!error && data) {
       live = data.map(d => ({
-        id:      d.id,
         name:    d.name,
         program: d.program,
         comment: d.comment,
+        email:   d.gsd_email,
         date:    formatDate(d.created_at),
       }));
     }
   }
 
-  // 3. Combine: live first, then seeded
-  const all = [...live, ...seeded];
+  // 3. Split into categories
+  const paper           = live.filter(d => d.email === PAPER_EMAIL);
+  const online          = live.filter(d => d.email !== PAPER_EMAIL);
+  const withComments    = online.filter(d => d.comment && d.comment.trim());
+  const withoutComments = online.filter(d => !d.comment || !d.comment.trim());
+  const seededVoices    = seeded.filter(s => s.comment && s.comment.trim());
 
-  // 4. Update count
-  const total = all.length + (SUPABASE_CONFIGURED ? 0 : 0); // count from combined
-  if (countEl) countEl.textContent = all.length;
-
-  // Also update nav/hero counts
+  // 4. Total count = every approved entry (online + paper + seeded)
+  const totalCount = live.length + seeded.length;
   document.querySelectorAll('[data-supporter-count]').forEach(el => {
-    el.textContent = all.length;
+    el.textContent = totalCount;
   });
 
-  // 5. Render wall
+  // 5. Render voices wall — only entries with comments
   wall.innerHTML = '';
-  if (all.length === 0) {
+  const allVoices = [...withComments, ...seededVoices];
+  if (allVoices.length === 0) {
     wall.innerHTML = '<div class="wall-loading">No reactions yet. Be the first!</div>';
-    return;
+  } else {
+    allVoices.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'supporter-card';
+      card.innerHTML = `
+        <div class="supporter-comment">"${escapeHtml(s.comment)}"</div>
+        <div class="supporter-name">${escapeHtml(s.name)}</div>
+        ${s.program ? `<div class="supporter-program">${escapeHtml(s.program)}</div>` : ''}
+      `;
+      wall.appendChild(card);
+    });
   }
 
-  all.forEach(s => {
-    const card = document.createElement('div');
-    card.className = 'supporter-card';
-    card.innerHTML = `
-      <div class="supporter-name">${escapeHtml(s.name)}</div>
-      ${s.program ? `<div class="supporter-program">${escapeHtml(s.program)}</div>` : ''}
-      ${s.comment ? `<div class="supporter-comment">"${escapeHtml(s.comment)}"</div>` : ''}
-      <div class="supporter-date">${s.date || ''}</div>
-    `;
-    wall.appendChild(card);
-  });
+  // 6. Render supporters name list — entries with no comment
+  if (nameList) {
+    nameList.innerHTML = '';
+    if (withoutComments.length === 0) {
+      nameList.innerHTML = '<p style="opacity:0.4;font-size:0.875rem">None yet.</p>';
+    } else {
+      withoutComments.forEach(s => {
+        const item = document.createElement('div');
+        item.className = 'supporter-name-item';
+        item.innerHTML = `
+          <span class="supporter-name-item__name">${escapeHtml(s.name)}</span>
+          ${s.program ? `<span class="supporter-name-item__program"> · ${escapeHtml(s.program)}</span>` : ''}
+        `;
+        nameList.appendChild(item);
+      });
+    }
+  }
+
+  // 7. Paper petition count
+  if (paperCountEl) {
+    paperCountEl.textContent = paper.length;
+  }
 }
 
 // ---- Handle form submission ----
 
 async function initPetitionForm() {
-  const form      = document.getElementById('petition-form');
-  const feedback  = document.getElementById('petition-feedback');
+  const form        = document.getElementById('petition-form');
+  const feedback    = document.getElementById('petition-feedback');
   const missingNote = document.getElementById('supabase-missing');
 
   if (!form) return;
 
-  // Show note if Supabase not configured
   if (!SUPABASE_CONFIGURED && missingNote) {
     missingNote.style.display = 'block';
     form.querySelectorAll('input, textarea, button[type="submit"]').forEach(el => {
@@ -107,33 +130,43 @@ async function initPetitionForm() {
     const email     = form.gsd_email.value.trim().toLowerCase();
     const comment   = form.comment.value.trim();
 
-    // Validate email
     if (!email.endsWith('@gsd.harvard.edu') && !email.endsWith('@harvard.edu')) {
       showFeedback(feedback, 'error', 'Please use your GSD or Harvard email address.');
       return;
     }
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Signing...';
+    submitBtn.disabled    = true;
+    submitBtn.textContent = 'Submitting…';
 
+    // Insert with approved: false — requires admin review before going public
     const { error } = await supabaseClient
       .from('supporters')
-      .insert([{ name, program: program || null, gsd_email: email, comment: comment || null }]);
+      .insert([{ name, program: program || null, gsd_email: email, comment: comment || null, approved: false }]);
 
     if (error) {
       showFeedback(feedback, 'error', 'Something went wrong. Please try again.');
-      submitBtn.disabled = false;
+      submitBtn.disabled    = false;
       submitBtn.textContent = 'Add your voice';
       return;
     }
 
-    form.reset();
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Add your voice';
-    showFeedback(feedback, 'success', 'Thank you — your reaction will appear on the wall shortly.');
+    // Notify admin — fire-and-forget (activate by clicking the link in the first email formsubmit.co sends)
+    fetch('https://formsubmit.co/ajax/wyatt_roy@gsd.harvard.edu', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject:  'New unstudio voice awaiting approval',
+        _template: 'table',
+        Name:      name,
+        Program:   program || '—',
+        Comment:   comment || '(no comment)',
+      }),
+    }).catch(() => {}); // non-blocking
 
-    // Reload the wall to show the new entry
-    setTimeout(loadSupporters, 1000);
+    form.reset();
+    submitBtn.disabled    = false;
+    submitBtn.textContent = 'Add your voice';
+    showFeedback(feedback, 'success', 'Thank you — your voice has been submitted and will appear once reviewed.');
   });
 }
 
@@ -144,7 +177,7 @@ function showFeedback(el, type, message) {
   el.textContent   = message;
   el.className     = `form-feedback ${type}`;
   el.style.display = 'block';
-  setTimeout(() => { el.style.display = 'none'; }, 6000);
+  setTimeout(() => { el.style.display = 'none'; }, 8000);
 }
 
 function escapeHtml(str) {
@@ -158,8 +191,7 @@ function escapeHtml(str) {
 
 function formatDate(iso) {
   if (!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
 // ---- Init ----
