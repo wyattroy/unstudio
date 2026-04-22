@@ -80,25 +80,42 @@ async function loadSupporters() {
     });
   }
 
-  // 6. Render supporters name list — entries with no comment
+  // 6. Render program diversity chips
+  const chartEl = document.getElementById('programs-chart');
+  if (chartEl) {
+    const allOnline = [...withComments, ...withoutComments];
+    const uniquePrograms = [...new Set(
+      allOnline.map(s => normalizeProgram(s.program)).filter(Boolean)
+    )].sort((a, b) => a === 'MDes' ? -1 : b === 'MDes' ? 1 : a.localeCompare(b));
+
+    chartEl.innerHTML = '';
+    uniquePrograms.forEach(p => {
+      const chip = document.createElement('span');
+      chip.className = 'program-chip';
+      chip.textContent = p;
+      chartEl.appendChild(chip);
+    });
+  }
+
+  // 7. Render supporters name list — entries with no comment
   if (nameList) {
     nameList.innerHTML = '';
     if (withoutComments.length === 0) {
-      nameList.innerHTML = '<p style="opacity:0.4;font-size:0.875rem">None yet.</p>';
+      nameList.innerHTML = '<p style="opacity:0.4;font-size:0.875rem;grid-column:1/-1">None yet.</p>';
     } else {
       withoutComments.forEach(s => {
         const item = document.createElement('div');
         item.className = 'supporter-name-item';
         item.innerHTML = `
           <span class="supporter-name-item__name">${escapeHtml(s.name)}</span>
-          ${s.program ? `<span class="supporter-name-item__program"> · ${escapeHtml(s.program)}</span>` : ''}
+          <span class="supporter-name-item__program">${escapeHtml(s.program || '')}</span>
         `;
         nameList.appendChild(item);
       });
     }
   }
 
-  // 7. Paper petition count
+  // 8. Paper petition count
   if (paperCountEl) {
     paperCountEl.textContent = paper.length;
   }
@@ -151,7 +168,7 @@ async function initPetitionForm() {
     }
 
     // Notify admin — fire-and-forget (activate by clicking the link in the first email formsubmit.co sends)
-    fetch('https://formsubmit.co/ajax/wyatt_roy@gsd.harvard.edu', {
+    fetch('https://formsubmit.co/ajax/3d14e485b6a2f8ef096a247dd9d4ecd5', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
@@ -171,6 +188,12 @@ async function initPetitionForm() {
 }
 
 // ---- Utilities ----
+
+function normalizeProgram(p) {
+  if (!p) return null;
+  if (/mdes/i.test(p)) return 'MDes';
+  return p.trim();
+}
 
 function showFeedback(el, type, message) {
   if (!el) return;

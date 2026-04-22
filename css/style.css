@@ -605,21 +605,44 @@ a { color: inherit; }
   margin-bottom: 2rem;
 }
 
+.programs-chart {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.program-chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.8rem;
+  border: 1.5px solid var(--black);
+  border-radius: 100px;
+}
+
 .supporters-name-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 3rem;
   margin-top: 2rem;
-  columns: 2;
-  column-gap: 2rem;
 }
 
 @media (max-width: 600px) {
-  .supporters-name-list { columns: 1; }
+  .supporters-name-list { grid-template-columns: 1fr; }
 }
 
 .supporter-name-item {
+  display: contents;
+}
+
+.supporter-name-item__name,
+.supporter-name-item__program {
   font-size: 0.875rem;
   padding: 0.4rem 0;
   border-bottom: 1px solid rgba(0,0,0,0.07);
-  break-inside: avoid;
 }
 
 .supporter-name-item__name {
