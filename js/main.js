@@ -96,7 +96,7 @@ function initLightbox() {
 
   document.querySelectorAll('.gallery-item').forEach(item => {
     item.addEventListener('click', () => {
-      img.src = item.querySelector('img').src;
+      img.src = item.dataset.full;
       lb.classList.add('open');
     });
   });

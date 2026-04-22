@@ -919,6 +919,15 @@ a { color: inherit; }
   line-height: 1.3;
 }
 
+.event-host {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pink);
+  margin-top: 0.25rem;
+}
+
 .event-desc {
   font-size: 0.85rem;
   color: #666;
