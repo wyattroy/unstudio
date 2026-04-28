@@ -42,6 +42,7 @@ body {
 }
 img { display: block; max-width: 100%; }
 a { color: inherit; }
+em { font-variation-settings: 'slnt' -10; font-style: normal; }
 
 /* ===== NAV ===== */
 .nav {
